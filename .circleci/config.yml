@@ -20,6 +20,9 @@ jobs:
       - save_cache:
           paths: [frontend/node_modules]
           key: frontend-build
+      - slack/notify:
+          event: pass
+          template: success_tagged_deploy_1
   build-backend:
     docker:
       - image: circleci/node:13.8.0
@@ -36,6 +39,9 @@ jobs:
       - save_cache:
           paths: [backend/node_modules]
           key: backend-build
+      - slack/notify:
+          event: pass
+          template: success_tagged_deploy_1
   test-frontend:
     docker:
       - image: circleci/node:13.8.0
@@ -109,3 +115,4 @@ workflows:
           requires: [build-frontend]
       - scan-backend:
           requires: [build-backend]
+          context: slack-secrets
