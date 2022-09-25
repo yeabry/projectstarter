@@ -1,4 +1,7 @@
 version: 2.1
+
+orbs:
+  slack: circleci/slack@4.10.1
             
 jobs:
   build-frontend:
@@ -65,9 +68,9 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          keys: [backend-scan]
+          keys: [frontend-scan]
       - run:
-          name: Run backend scan
+          name: Run frontend scan
           command: |
               cd frontend
               npm install
