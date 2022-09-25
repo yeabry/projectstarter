@@ -92,6 +92,10 @@ jobs:
               # npm install oauth-sign@^0.9.0
               npm audit fix --audit-level=critical --force
               npm audit --audit-level=critical
+      - slack/notify:
+          channel: C043W48L8S0
+          event: fail
+          template: basic_fail_1
 workflows:
   default:
     jobs:
@@ -105,3 +109,7 @@ workflows:
           requires: [build-frontend]
       - scan-backend:
           requires: [build-backend]
+  deploy_and_notify:
+    jobs:
+      - deploy:
+          context: slack-secrets
