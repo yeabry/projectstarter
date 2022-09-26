@@ -154,7 +154,7 @@ jobs:
       # Here's where you will add some code to rollback on failure
   configure-infrastructure:
     docker:
-      - image: 3.10.7-alpine3.15
+      - image: python:3.10.7-alpine3.15
     steps:
       - checkout
       - add_ssh_keys:
