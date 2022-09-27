@@ -160,7 +160,7 @@ jobs:
       - add_ssh_keys:
           fingerprints: ["55:6a:b8:f3:52:3a:4f:9b:04:e1:a7:d1:04:9a:bf:88"]
       - attach_workspace:
-          at: /.circleci/ansible
+          at: ~/
       - run:
           name: Install dependencies
           command: |
@@ -170,7 +170,8 @@ jobs:
           name: Configure server
           command: |
             export ANSIBLE_HOST_KEY_CHECKING=False
-            ansible-playbook -i .circleci/ansible/inventory.txt .circleci/ansible/configure-server.yml
+            cd .circleci/ansible
+            ansible-playbook -i inventory.txt configure-server.yml
       - destroy-environment    
 workflows:
   default:
