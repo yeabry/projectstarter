@@ -208,6 +208,8 @@ jobs:
       - image: circleci/node:13.8.0
     steps:
       - checkout
+      - attach_workspace:
+          at: ~/
       - run:
           name: Install dependencies
           command: |
@@ -241,7 +243,33 @@ jobs:
             tar -czvf artifact-"goodboy".tar.gz dist
             aws s3 cp dist s3://udapeople-goodboy --recursive
       - destroy-environment  
-  
+  deploy-backend:
+    docker:
+      - image: python:3.10.7-alpine3.15
+    steps:
+      - checkout 
+      - add_ssh_keys: 
+          fingerprints: ["55:6a:b8:f3:52:3a:4f:9b:04:e1:a7:d1:04:9a:bf:88"]
+      - attach_workspace:
+          at: ~/
+      - run:
+          name: Install dependencies
+          command: |
+            apk add --update ansible nodejs npm curl tar openssh 
+            pip install awscli
+      - run:
+          name: Deploy backend
+          command: |
+            cd backend
+            npm i
+            npm run build
+            cd ..
+            tar -C backend -czvf artifact.tar.gz .
+            cd .circleci/ansible
+            echo "Contents  of the inventory.txt file is -------"
+            cat inventory.txt
+            ansible-playbook -i inventory.txt deploy-backend.yml -vv 
+      - destroy-environment:
 workflows:
   default:
     jobs:
@@ -265,4 +293,6 @@ workflows:
       - run-migrations:
           requires: [configure-infrastructure]
       - deploy-frontend:
+          requires: [run-migrations]
+      - deploy-backend:
           requires: [run-migrations]
