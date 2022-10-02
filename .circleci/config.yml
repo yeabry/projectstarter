@@ -32,10 +32,10 @@ jobs:
       - save_cache:
           paths: [frontend/node_modules]
           key: frontend-build
-      - slack/notify:
-          channel: '#circleci'
-          template: basic_success_1
-          event: always
+      # - slack/notify:
+      #     channel: '#circleci'
+      #     template: basic_success_1
+      #     event: always
   build-backend:
     docker:
       - image: circleci/node:13.8.0
@@ -52,9 +52,9 @@ jobs:
       - save_cache:
           paths: [backend/node_modules]
           key: backend-build
-      - slack/notify:
-          template: basic_success_1
-          event: always
+      # - slack/notify:
+      #     template: basic_success_1
+      #     event: always
   test-frontend:
     docker:
       - image: circleci/node:13.8.0
@@ -110,133 +110,133 @@ jobs:
               npm install
               # npm install oauth-sign@^0.9.0
               npm audit fix --audit-level=critical --force
-              npm audit --audit-level=critical
-      - slack/notify:
-          channel: '#circleci'
-          event: fail
-          template: basic_fail_1
-
-  deploy-infrastructure:
-    docker:
-      - image: amazon/aws-cli
-    steps:
-      - checkout
-      - run:
-          name: Install dependencies
-          command: |
-            yum -y install tar
-            yum -y install gzip
-      - run:
-          name: Ensure back-end infrastructure exists
-          command: |
-            aws cloudformation deploy \
-              --template-file .circleci/files/backend.yml \
-              --tags project=udacity \
-              --stack-name "udapeople-backend-goodboy" \
-              --parameter-overrides ID="goodboy"  
-      - run:
-          name: Ensure front-end infrastructure exist
-          command: |
-            aws cloudformation deploy \
-              --template-file .circleci/files/frontend.yml \
-              --tags project=udacity \
-              --stack-name "udapeople-frontend-goodboy" \
-              --parameter-overrides ID="goodboy"  
-      - run:
-          name: Add back-end ip to ansible inventory
-          command: |
-            echo "[web]" > .circleci/ansible/inventory.txt
-            echo "54.225.7.77" > .circleci/ansible/inventory.txt
-      - persist_to_workspace:
-          root: ~/
-          paths:
-            - project/.circleci/ansible/inventory.txt
-      # Here's where you will add some code to rollback on failure
-  configure-infrastructure:
-    docker:
-      - image: python:3.10.7-alpine3.15
-    steps:
-      - checkout
-      - add_ssh_keys:
-          fingerprints: ["55:6a:b8:f3:52:3a:4f:9b:04:e1:a7:d1:04:9a:bf:88"]
-      - attach_workspace:
-          at: ~/
-      - run:
-          name: Install dependencies
-          command: |
-            pip install awscli
-            apk add --update ansible
-      - run:
-          name: Configure server
-          command: |
-            export ANSIBLE_HOST_KEY_CHECKING=False
-            cd .circleci/ansible
-            ansible-playbook -i inventory.txt configure-server.yml
-      - destroy-environment    
-  run-migrations:
-    docker:
-      - image: circleci/node:13.8.0
-    steps:
-      - checkout
-      - restore_cache:
-          keys: [backend-build]
-      - run:
-          name: Install AWS CLI
-          command: |
-            sudo apt-get update && sudo apt-get install -yy less
-            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-            unzip awscliv2.zip
-            sudo ./aws/install
-      - run:
-          name: Run migrations
-          command: |
-            cd backend
-            npm install
-            # Run and save the migration output
-            npm run migrations > migrations_dump.txt
-      - run:
-          name: Send migration results to kvbd
-          command: |
-            if grep -q "has been executed successfully." ~/project/backend/migrations_dump.txt
-            then
-              curl https://kvdb.io/Noir3xAHGQCwSYcM3NPLNi/migration_goodboy -d '1'
-              curl --insecure https://kvdb.io/Noir3xAHGQCwSYcM3NPLNi/migration_goodboy
-            fi
-      - destroy-environment
-  deploy-frontend:
-    docker:
-      - image: amazon/aws-cli
-    steps:
-      - checkout
-      - attach_workspace:
-          at: .
-      - run:
-          name: Install dependencies
-          command: |
-            apt-get update
-            apt -y install nodejs npm
-      - run:
-          name: Get backend url
-          command: |
-            export BACKEND_IP=$(
-              aws ec2 describe-instances \
-              --query 'Reservations[*].Instances[*].PublicIpAddress' \
-              --filters "Name=tag:project,Values=backend-goodboy" \
-              --output text
-            )
-            export API_URL="http://${BACKEND_IP}:3030"
-            echo "API_URL = ${API_URL}"
-            echo API_URL="http://${BACKEND_IP}:3030" >> frontend/.env
-            cat frontend/.env
-      - run:
-          name: Deploy frontend objects
-          command: |
-            cd frontend
-            npm install
-            npm run build
-            tar -czvf artifact-"goodboy".tar.gz dist
-            aws s3 cp dist s3://udapeople-goodboy --recursive
-      - destroy-environment  
+              # npm audit --audit-level=critical
+      # - slack/notify:
+      #     channel: '#circleci'
+      #     event: fail
+      #     template: basic_fail_1
+  # deploy-infrastructure:
+  #   docker:
+  #     - image: amazon/aws-cli
+  #   steps:
+  #     - checkout
+  #     - run:
+  #         name: Install dependencies
+  #         command: |
+  #           yum -y install tar
+  #           yum -y install gzip
+  #     - run:
+  #         name: Ensure back-end infrastructure exists
+  #         command: |
+  #           aws cloudformation deploy \
+  #             --template-file .circleci/files/backend.yml \
+  #             --tags project=udacity \
+  #             --stack-name "udapeople-backend-goodboy" \
+  #             --parameter-overrides ID="goodboy"  
+  #     - run:
+  #         name: Ensure front-end infrastructure exist
+  #         command: |
+  #           aws cloudformation deploy \
+  #             --template-file .circleci/files/frontend.yml \
+  #             --tags project=udacity \
+  #             --stack-name "udapeople-frontend-goodboy" \
+  #             --parameter-overrides ID="goodboy"  
+  #     - run:
+  #         name: Add back-end ip to ansible inventory
+  #         command: |
+  #           echo "[web]" > .circleci/ansible/inventory.txt
+  #           echo "54.225.7.77" > .circleci/ansible/inventory.txt
+  #     - persist_to_workspace:
+  #         root: ~/
+  #         paths:
+  #           - project/.circleci/ansible/inventory.txt
+  #     # Here's where you will add some code to rollback on failure
+  # configure-infrastructure:
+  #   docker:
+  #     - image: python:3.10.7-alpine3.15
+  #   steps:
+  #     - checkout
+  #     - add_ssh_keys:
+  #         fingerprints: ["55:6a:b8:f3:52:3a:4f:9b:04:e1:a7:d1:04:9a:bf:88"]
+  #     - attach_workspace:
+  #         at: ~/
+  #     - run:
+  #         name: Install dependencies
+  #         command: |
+  #           pip install awscli
+  #           apk add --update ansible
+  #     - run:
+  #         name: Configure server
+  #         command: |
+  #           export ANSIBLE_HOST_KEY_CHECKING=False
+  #           cd .circleci/ansible
+  #           ansible-playbook -i inventory.txt configure-server.yml
+  #     - destroy-environment    
+  # run-migrations:
+  #   docker:
+  #     - image: circleci/node:13.8.0
+  #   steps:
+  #     - checkout
+  #     - restore_cache:
+  #         keys: [backend-build]
+  #     - run:
+  #         name: Install AWS CLI
+  #         command: |
+  #           sudo apt-get update && sudo apt-get install -yy less
+  #           curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+  #           unzip awscliv2.zip
+  #           sudo ./aws/install
+  #     - run:
+  #         name: Run migrations
+  #         command: |
+  #           cd backend
+  #           npm install
+  #           # Run and save the migration output
+  #           npm run migrations > migrations_dump.txt
+  #     - run:
+  #         name: Send migration results to kvbd
+  #         command: |
+  #           if grep -q "has been executed successfully." ~/project/backend/migrations_dump.txt
+  #           then
+  #             curl https://kvdb.io/Noir3xAHGQCwSYcM3NPLNi/migration_goodboy -d '1'
+  #             curl --insecure https://kvdb.io/Noir3xAHGQCwSYcM3NPLNi/migration_goodboy
+  #           fi
+  #     - destroy-environment
+  # deploy-frontend:
+  #   docker:
+  #     - image: amazon/aws-cli
+  #   steps:
+  #     - checkout
+  #     - attach_workspace:
+  #         at: .
+  #     - run:
+  #         name: Install dependencies
+  #         command: |
+  #           apt-get update
+  #           apt -y install nodejs npm
+  #     - run:
+  #         name: Get backend url
+  #         command: |
+  #           export BACKEND_IP=$(
+  #             aws ec2 describe-instances \
+  #             --query 'Reservations[*].Instances[*].PublicIpAddress' \
+  #             --filters "Name=tag:project,Values=backend-goodboy" \
+  #             --output text
+  #           )
+  #           export API_URL="http://${BACKEND_IP}:3030"
+  #           echo "API_URL = ${API_URL}"
+  #           echo API_URL="http://${BACKEND_IP}:3030" >> frontend/.env
+  #           cat frontend/.env
+  #     - run:
+  #         name: Deploy frontend objects
+  #         command: |
+  #           cd frontend
+  #           npm install
+  #           npm run build
+  #           tar -czvf artifact-"goodboy".tar.gz dist
+  #           aws s3 cp dist s3://udapeople-goodboy --recursive
+  #     - destroy-environment  
+  
 workflows:
   default:
     jobs:
