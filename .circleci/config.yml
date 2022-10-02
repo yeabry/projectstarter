@@ -181,6 +181,13 @@ jobs:
       - restore_cache:
           keys: [backend-build]
       - run:
+          name: Install AWS CLI
+          command: |
+            sudo apt-get update && sudo apt-get install -yy less
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            unzip awscliv2.zip
+            sudo ./aws/install
+      - run:
           name: Run migrations
           command: |
             cd backend
@@ -195,6 +202,7 @@ jobs:
               curl https://kvdb.io/Noir3xAHGQCwSYcM3NPLNi/migration_goodboy -d '1'
               curl --insecure https://kvdb.io/Noir3xAHGQCwSYcM3NPLNi/migration_goodboy
             fi
+      - destroy-environment
   deploy-frontend:
     docker:
       - image: amazon/aws-cli
