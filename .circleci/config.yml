@@ -208,13 +208,11 @@ jobs:
       - image: amazon/aws-cli
     steps:
       - checkout
-      - attach_workspace:
-          at: .
       - run:
           name: Install dependencies
           command: |
             apt-get update
-            apt -y install nodejs npm
+            apt -y install nodejs npm tar gzip
       - run:
           name: Get backend url
           command: |
