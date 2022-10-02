@@ -303,7 +303,7 @@ jobs:
       - run:
           name: Frontend smoke test.
           command: |
-              URL="http://udapeoplefrontendgoodboy.s3-website-us-east-1.amazonaws.com/#/employees"            
+              URL="http://udapeople-goodboy.s3-website-us-east-1.amazonaws.com/#/employees"            
               if curl -s ${URL} | grep "Welcome"
               then
                 return 0
