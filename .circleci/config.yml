@@ -144,34 +144,37 @@ jobs:
       - run:
           name: Add back-end ip to ansible inventory
           command: |
-            echo "[web]" > .circleci/ansible/inventory.txt
-            echo "54.225.7.77" > .circleci/ansible/inventory.txt
+            BACKEND_PUBLIC_IP=$(aws ec2 describe-instances \
+              --filters "Name=tag:Name,Values=backend-goodboy" \
+              --query 'Reservations[*].Instances[*].PublicIpAddress' \
+              --output text)
+            echo $BACKEND_PUBLIC_IP >> .circleci/ansible/inventory.txt
       - persist_to_workspace:
           root: ~/
           paths:
             - project/.circleci/ansible/inventory.txt
-  #     # Here's where you will add some code to rollback on failure
-  # configure-infrastructure:
-  #   docker:
-  #     - image: python:3.10.7-alpine3.15
-  #   steps:
-  #     - checkout
-  #     - add_ssh_keys:
-  #         fingerprints: ["55:6a:b8:f3:52:3a:4f:9b:04:e1:a7:d1:04:9a:bf:88"]
-  #     - attach_workspace:
-  #         at: ~/
-  #     - run:
-  #         name: Install dependencies
-  #         command: |
-  #           pip install awscli
-  #           apk add --update ansible
-  #     - run:
-  #         name: Configure server
-  #         command: |
-  #           export ANSIBLE_HOST_KEY_CHECKING=False
-  #           cd .circleci/ansible
-  #           ansible-playbook -i inventory.txt configure-server.yml
-  #     - destroy-environment    
+      - destroy-environment
+  configure-infrastructure:
+    docker:
+      - image: python:3.10.7-alpine3.15
+    steps:
+      - checkout
+      - add_ssh_keys:
+          fingerprints: ["55:6a:b8:f3:52:3a:4f:9b:04:e1:a7:d1:04:9a:bf:88"]
+      - attach_workspace:
+          at: ~/
+      - run:
+          name: Install dependencies
+          command: |
+            pip install awscli
+            apk add --update ansible
+      - run:
+          name: Configure server
+          command: |
+            export ANSIBLE_HOST_KEY_CHECKING=False
+            cd .circleci/ansible
+            ansible-playbook -i inventory.txt configure-server.yml
+      - destroy-environment    
   # run-migrations:
   #   docker:
   #     - image: circleci/node:13.8.0
@@ -254,9 +257,9 @@ workflows:
           requires: [build-backend]
           context: slack-secrets
       - deploy-infrastructure:
-          requires: [test-frontend, test-backend, scan-frontend]
-      # - configure-infrastructure:
-      #     requires: [deploy-infrastructure]
+          requires: [test-frontend, test-backend, scan-frontend, scan-backend]
+      - configure-infrastructure:
+          requires: [deploy-infrastructure]
       # - run-migrations:
       #     requires: [configure-infrastructure]
       # - deploy-frontend:
