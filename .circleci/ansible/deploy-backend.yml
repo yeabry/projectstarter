@@ -26,7 +26,7 @@
     - name: "wait 600 seconds for target connection to become reachable/usable."
       wait_for_connection:
         timeout: 600
-    - name: "install paython for ansible."
+    - name: "install python for ansible."
       become: true
       raw: test -e /usr/bin/python3 || (apt update -y && apt install python3 -y)
       changed_when: false
