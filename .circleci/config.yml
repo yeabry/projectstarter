@@ -15,6 +15,23 @@ commands:
           command: |
             aws cloudformation delete-stack --stack-name udapeople-frontend-goodboy
             aws cloudformation delete-stack --stack-name udapeople-backend-goodboy
+            aws s3 rm "s3://udapeople-frontend-goodboy" --recursive
+            aws s3 rm "s3://udapeople-goodboy" --recursive
+  revert-migrations:
+    description: Revert the last migration if successfully run in the current workflow.
+    steps:
+      - run:
+          name: Revert migrations
+          when: on_fail
+          command: |
+            SUCCESS=$(curl --insecure https://kvdb.io/Noir3xAHGQCwSYcM3NPLNi/migration_goodboy)
+            echo $SUCCESS
+            if(( $SUCCESS == 1 )); 
+            then
+              cd backend
+              # npm install
+              npm run migration:revert
+            fi
 jobs:
   build-frontend:
     docker:
@@ -306,7 +323,7 @@ jobs:
       - run:
           name: Frontend smoke test.
           command: |
-              URL="http://udapeople-goodboy.s3-website-us-east-1.amazonaws.com/#/employees"            
+              URL="http://udapeople-frontend-goodboy.s3-website-us-east-1.amazonaws.com/#/employees"            
               if curl -s ${URL} | grep "Welcome"
               then
                 return 0
