@@ -15,7 +15,7 @@
 
     - name: "install python for Ansible."
       become: true
-      rshell: |
+      shell: |
         sudo apt-get update -y
         sudo apt-get install -y nodejs 
         sudo apt-get install -y Python3.8
