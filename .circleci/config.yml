@@ -323,7 +323,7 @@ jobs:
       - run:
           name: Frontend smoke test.
           command: |
-              URL="http://udapeople-goodboy.s3-website-us-east-1.amazonaws.com/#/employees"            
+              URL="http://udapeople-frontend-goodboy.s3-website-us-east-1.amazonaws.com/#/employees"            
               if curl -s ${URL} | grep "Welcome"
               then
                 return 0
@@ -382,3 +382,5 @@ workflows:
           requires: [run-migrations]
       - smoke-test:
           requires: [deploy-frontend, deploy-backend]
+      - cloudfront-update:
+          requires: [smoke-test]
