@@ -140,8 +140,9 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            yum -y install tar
-            yum -y install gzip
+            yum -y install tar gzip
+            curl --silent --location https://rpm.nodesource.com/setup_18.x | bash -
+            yum -y install nodejs
       - run:
           name: Ensure back-end infrastructure exists
           command: |
