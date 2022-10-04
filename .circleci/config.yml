@@ -53,7 +53,7 @@ jobs:
       #     channel: '#circleci'
       #     template: basic_success_1
       #     event: always
-  build-backend:
+  build-backend: 
     docker:
       - image: circleci/node:13.8.0
     steps:
@@ -360,3 +360,4 @@ workflows:
           requires: [run-migrations]
       - smoke-test:
           requires: [deploy-frontend, deploy-backend]
+          
