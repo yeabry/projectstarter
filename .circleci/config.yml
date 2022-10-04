@@ -332,6 +332,28 @@ jobs:
               fi
       - destroy-environment 
       - revert-migrations
+  cloudfront-update:
+    docker:
+      - image: amazon/aws-cli
+    steps:
+      - checkout
+      - run:
+          name: Install dependencies
+          command: |
+            yum -y install tar gzip
+            curl --silent --location https://rpm.nodesource.com/setup_18.x | bash -
+            yum -y install nodejs
+      - run:
+          name: update cloudfront
+          command: |
+            aws cloudformation deploy \
+                    --template-file .circleci/files/cloudfront.yml \
+                    --stack-name InitialStack \
+                    --parameter-overrides WorkflowID="goodboy" \
+                    --tags project=udapeople
+      - revert-migrations
+      - destroy-environment
+  
 workflows:
   default:
     jobs:
@@ -360,4 +382,4 @@ workflows:
           requires: [run-migrations]
       - smoke-test:
           requires: [deploy-frontend, deploy-backend]
-          
+
