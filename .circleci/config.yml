@@ -141,8 +141,6 @@ jobs:
           name: Install dependencies
           command: |
             yum -y install tar gzip
-            curl --silent --location https://rpm.nodesource.com/setup_18.x | bash -
-            yum -y install nodejs
       - run:
           name: Ensure back-end infrastructure exists
           command: |
@@ -259,7 +257,7 @@ jobs:
             npm install
             npm run build
             tar -czvf artifact-"goodboy".tar.gz dist
-            aws s3 cp dist s3://udapeople-goodboy --recursive
+            aws s3 cp dist s3://udapeople-frontend-goodboy --recursive
       - destroy-environment  
   deploy-backend:
     docker:
