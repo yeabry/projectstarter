@@ -170,6 +170,7 @@ jobs:
           root: ~/
           paths:
             - project/.circleci/ansible/inventory.txt
+      - destroy-environment 
   configure-infrastructure:
     docker:
       - image: python:3.10.7-alpine3.15
