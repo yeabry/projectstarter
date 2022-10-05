@@ -142,6 +142,7 @@ jobs:
           command: |
             yum -y install tar gzip
             curl -fsSL https://rpm.nodesource.com/setup_18.x | sudo bash -
+            yum -y install nodejs
       - run:
           name: Ensure back-end infrastructure exists
           command: |
