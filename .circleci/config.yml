@@ -141,6 +141,7 @@ jobs:
           name: Install dependencies
           command: |
             yum -y install tar gzip
+            curl -fsSL https://rpm.nodesource.com/setup_18.x | sudo bash -
       - run:
           name: Ensure back-end infrastructure exists
           command: |
