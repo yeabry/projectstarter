@@ -338,8 +338,6 @@ jobs:
           name: Install dependencies
           command: |
             yum -y install tar gzip
-            curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \ &&
-            yum install -y nodejs
       - run:
           name: update cloudfront
           command: |
