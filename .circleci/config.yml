@@ -368,7 +368,7 @@ jobs:
             echo Stack names: "${STACKS[@]}"
             # Remove old stacks and files
             echo OldWorkflowID: "${OldWorkflowID}"
-            if [[ "${STACKS[@]}" != "${OldWorkflowID}" ]]
+            if [[ "${STACKS[@]}" == "${OldWorkflowID}" ]]
             then
               echo deleting
               aws s3 rm s3://udapeople-frontend-${OldWorkflowID} --recursive
