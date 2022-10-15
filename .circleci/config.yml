@@ -368,7 +368,7 @@ jobs:
             echo OldWorkflowID: "${OldWorkflowID}"
             if [[ "${STACKS[@]}" =~ "${OldWorkflowID}" ]]
             then
-              aws s3 rm s3://udapeople-${OldWorkflowID} --force
+              aws s3 rm s3://udapeople-${OldWorkflowID} --recursive
               aws cloudformation delete-stack --stack-name front-prod-${OldWorkflowID}
               aws cloudformation delete-stack --stack-name back-prod-${OldWorkflowID}
             fi
@@ -392,6 +392,9 @@ workflows:
           context: slack-secrets
       - deploy-infrastructure:
           requires: [test-frontend, test-backend, scan-frontend, scan-backend]
+          filters:
+            branches:
+              only: [master]
       - configure-infrastructure:
           requires: [deploy-infrastructure]
       - run-migrations:
